@@ -7,6 +7,7 @@ class WSTrade():
     def __init__(self, email: str, password: str):
         self._login(email, password)
         self.accounts = []
+        self.getAccountID()
 
     def _login(self, email: str, password: str):
         """
@@ -86,7 +87,7 @@ class WSTrade():
         req = requests.get(query_url, headers=self._header).text
         return json.loads(req)
 
-    def getQuote(self, sec_id: str, last_price_forex_buy: bool = True) -> dict:
+    def getQuote(self, sec_id: str, last_price_forex_buy: bool = True, convert: bool = False) -> dict:
         """
         Given the security id, it would return its prices.
         If the security's currency is USD, it would automatically
@@ -101,7 +102,7 @@ class WSTrade():
             quote['ask']), float(quote['bid']),\
             float(quote['amount'])
 
-        if currency == 'USD':
+        if currency == 'USD' and convert:
             forex = self.getForex()['USD']
             buy_rate, sell_rate = forex['buy_rate'], forex['sell_rate']
             res['bid'] = (res['bid'] * buy_rate)
@@ -116,12 +117,14 @@ class WSTrade():
                     security_id: str,
                     order_type: str = 'buy_quantity',
                     sub_type: str = 'market',
-                    account: str = self.accounts[0]['AccountID'],
+                    account: str = None,
                     limit_price: float = 1,
-                    quantity: int = 1,):
+                    quantity: int = 1):
         """
         Create an order based on the specifications.
         """
+        if account == None:
+            account = self.accounts[0]['AccountID']
         if order_type == "sell_quantity" and sub_type == "market":
             order_dict = {
                 "account_id": account,
@@ -146,22 +149,30 @@ class WSTrade():
                             json=order_dict).text
         return json.loads(req)
 
-    def buyLimitOrder(self, security_id, limit_price, account_id=self.accounts[0]['AccountID'], quantity=1):
+    def buyLimitOrder(self, security_id, limit_price, account_id=None, quantity=1):
+        if account_id == None:
+            account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'buy_quantity',
                                'limit', account_id, limit_price, quantity)
         return res
 
-    def buyMarketOrder(self, security_id, limit_price=1, account_id=self.accounts[0]['AccountID'], quantity=1):
+    def buyMarketOrder(self, security_id, limit_price=1, account_id=None, quantity=1):
+        if account_id == None:
+            account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'buy_quantity',
                                'market', account_id, limit_price, quantity)
         return res
 
-    def sellLimitOrder(self, security_id, limit_price, account_id=self.accounts[0]['AccountID'], quantity=1):
+    def sellLimitOrder(self, security_id, limit_price, account_id=None, quantity=1):
+        if account_id == None:
+            account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'sell_quantity',
                                'limit', account_id, limit_price, quantity)
         return res
 
-    def sellMarketOrder(self, security_id, account_id=self.accounts[0]['AccountID'], quantity=1):
+    def sellMarketOrder(self, security_id, account_id=None, quantity=1):
+        if account_id == None:
+            account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'sell_quantity',
                                'market', account_id, quantity=quantity)
         return res
