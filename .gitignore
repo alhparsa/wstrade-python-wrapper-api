@@ -123,3 +123,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Test file
+test.py
+config.json
+
+# VS Code config
+.vscode/
