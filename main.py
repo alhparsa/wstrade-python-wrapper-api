@@ -176,3 +176,63 @@ class WSTrade():
         res = self._placeOrder(security_id, 'sell_quantity',
                                'market', account_id, quantity=quantity)
         return res
+
+    def _getOrderHistory(self):
+        """
+        Returns all the orders submitted by this account
+        """
+        order_url = "https://trade-service.wealthsimple.com/orders/"
+        req = requests.get(order_url, headers=self._header).text
+        return json.loads(req)
+
+    def getOrderHistory(self) -> dict:
+        """
+        Returns all the orders submitted by this account
+        """
+
+        return self._getOrderHistory()
+
+    def getPendingOrders(self) -> dict:
+        """
+        Returns all the pending orders submitted by this account
+        """
+        orders = self.getOrderHistory()
+        res = []
+        for order in orders:
+            if order['filled_at'] == None and order['status'] != 'cancelled':
+                res.append(order)
+        return res
+
+    def getCancelledOrders(self) -> dict:
+        """
+        Returns all the cancelled orders submitted by this account
+        """
+        orders = self.getOrderHistory()
+        res = []
+        for order in orders:
+            if order['status'] == 'cancelled':
+                res.append(order)
+        return res
+
+    def getFilledOrders(self) -> dict:
+        """
+        Returns all the filled orders submitted by this account
+        """
+        orders = self.getOrderHistory()
+        res = []
+        for order in orders:
+            if order['status'] == 'posted':
+                res.append(order)
+        return res
+
+    def _cancelOrder(self, order_id):
+        order_url = f'https://trade-service.wealthsimple.com/{order_id}'
+        res = requests.delete(order_url, headers=self._header).text
+        return res
+
+    def cancelOrder(self, order_id):
+        """
+        Given an order id, it will cancel the order
+        """
+        res = self._cancelOrder(order_id)
+        return res
