@@ -130,3 +130,5 @@ config.json
 
 # VS Code config
 .vscode/
+Untitled.ipynb
+.pypirc

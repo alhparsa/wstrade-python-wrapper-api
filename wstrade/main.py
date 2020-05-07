@@ -177,11 +177,11 @@ class WSTrade():
                                'market', account_id, quantity=quantity)
         return res
 
-    def _getOrderHistory(self):
+    def _getOrderHistory(self, account_id):
         """
         Returns all the orders submitted by this account
         """
-        order_url = "https://trade-service.wealthsimple.com/orders/"
+        order_url = "https://trade-service.wealthsimple.com/orders/?account="
         req = requests.get(order_url, headers=self._header).text
         return json.loads(req)
 
