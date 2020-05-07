@@ -11,9 +11,7 @@ This repository is only for personal usage and is not maintained professionally.
 To get started, use the following commands to download the repository and install its dependancies:
 
 ```
-git clone something
-cd wstrade-api
-pip install -r requirements.txt
+pip install WSTrade-alhparsa
 ```
 
 ## Requirements

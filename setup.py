@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setuptools.setup(
     name="WSTrade-alhparsa",  # Replace with your own username
-    version="0.0.1.a",
+    version="0.0.1a1",
     author="Parsa Alamzadeh",
     author_email="alh.parsa@gmail.com",
     description="A wrapper for WS Trade API to remotely execute orders",
