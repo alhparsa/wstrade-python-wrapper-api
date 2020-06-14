@@ -8,7 +8,6 @@ class WSTrade():
         self._login(email, password)
         self.accounts = []
         self.getAccountID()
-
     def _login(self, email: str, password: str):
         """
         Given an email and passowrd, it will initiate a connection
@@ -54,8 +53,9 @@ class WSTrade():
             for account in js:
                 temp = {}
                 temp['AccountID'] = account['id']
-                temp['Blanace'] = float(account['current_balance']['amount'])
+                temp['Balance'] = float(account['current_balance']['amount'])
                 temp['BuyingPower'] = float(account['buying_power']['amount'])
+                temp['PositionQuantities'] = account['position_quantities']
                 self.accounts.append(temp)
             return self.accounts
         except:
@@ -123,7 +123,7 @@ class WSTrade():
         """
         Create an order based on the specifications.
         """
-        if account == None:
+        if account is None:
             account = self.accounts[0]['AccountID']
         if order_type == "sell_quantity" and sub_type == "market":
             order_dict = {
@@ -150,28 +150,28 @@ class WSTrade():
         return json.loads(req)
 
     def buyLimitOrder(self, security_id, limit_price, account_id=None, quantity=1):
-        if account_id == None:
+        if account_id is None:
             account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'buy_quantity',
                                'limit', account_id, limit_price, quantity)
         return res
 
     def buyMarketOrder(self, security_id, limit_price=1, account_id=None, quantity=1):
-        if account_id == None:
+        if account_id is None:
             account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'buy_quantity',
                                'market', account_id, limit_price, quantity)
         return res
 
     def sellLimitOrder(self, security_id, limit_price, account_id=None, quantity=1):
-        if account_id == None:
+        if account_id is None:
             account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'sell_quantity',
                                'limit', account_id, limit_price, quantity)
         return res
 
     def sellMarketOrder(self, security_id, account_id=None, quantity=1):
-        if account_id == None:
+        if account_id is None:
             account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'sell_quantity',
                                'market', account_id, quantity=quantity)
@@ -199,7 +199,7 @@ class WSTrade():
         orders = self.getOrderHistory()
         res = []
         for order in orders:
-            if order['filled_at'] == None and order['status'] != 'cancelled':
+            if order['filled_at'] is None and order['status'] != 'cancelled':
                 res.append(order)
         return res
 
