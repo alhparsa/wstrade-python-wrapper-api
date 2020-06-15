@@ -185,40 +185,48 @@ class WSTrade():
         req = requests.get(order_url, headers=self._header).text
         return json.loads(req)
 
-    def getOrderHistory(self) -> dict:
+    def getOrderHistory(self, account_id=None) -> dict:
         """
         Returns all the orders submitted by this account
         """
+        if account_id is None:
+            account_id = self.accounts[0]['AccountID']
 
-        return self._getOrderHistory()
+        return self._getOrderHistory(account_id)
 
-    def getPendingOrders(self) -> dict:
+    def getPendingOrders(self, account_id=None) -> dict:
         """
         Returns all the pending orders submitted by this account
         """
-        orders = self.getOrderHistory()
+        if account_id is None:
+            account_id = self.accounts[0]['AccountID']
+        orders = self.getOrderHistory(account_id)['results']
         res = []
         for order in orders:
             if order['filled_at'] is None and order['status'] != 'cancelled':
                 res.append(order)
         return res
 
-    def getCancelledOrders(self) -> dict:
+    def getCancelledOrders(self, account_id=None) -> dict:
         """
         Returns all the cancelled orders submitted by this account
         """
-        orders = self.getOrderHistory()
+        if account_id is None:
+            account_id = self.accounts[0]['AccountID']
+        orders = self.getOrderHistory(account_id)['results']
         res = []
         for order in orders:
             if order['status'] == 'cancelled':
                 res.append(order)
         return res
 
-    def getFilledOrders(self) -> dict:
+    def getFilledOrders(self, account_id=None) -> dict:
         """
         Returns all the filled orders submitted by this account
         """
-        orders = self.getOrderHistory()
+        if account_id is None:
+            account_id = self.accounts[0]['AccountID']
+        orders = self.getOrderHistory(account_id)['results']
         res = []
         for order in orders:
             if order['status'] == 'posted':
