@@ -8,6 +8,7 @@ class WSTrade():
         self._login(email, password)
         self.accounts = []
         self.getAccountID()
+
     def _login(self, email: str, password: str):
         """
         Given an email and passowrd, it will initiate a connection
@@ -119,20 +120,27 @@ class WSTrade():
                     sub_type: str = 'market',
                     account: str = None,
                     limit_price: float = 1,
-                    quantity: int = 1):
+                    quantity: int = 1,
+                    gtc: bool = False):
         """
         Create an order based on the specifications.
         """
+        if gtc:
+            time_in_force = 'until_cancel'
+        else:
+            time_in_force = 'day'
         if account is None:
             account = self.accounts[0]['AccountID']
-        if order_type == "sell_quantity" and sub_type == "market":
+        assert (order_type == 'sell_quantity' or 'buy_quantity')
+        assert (sub_type == 'market' or sub_type == 'limit')
+        if sub_type == "market":
             order_dict = {
                 "account_id": account,
                 "quantity": quantity,
                 "security_id": security_id,
                 "order_type": order_type,
                 "order_sub_type": sub_type,
-                "time_in_force": "day",
+                "time_in_force": time_in_force,
             }
         else:
             order_dict = {
@@ -141,7 +149,7 @@ class WSTrade():
                 "security_id": security_id,
                 "order_type": order_type,
                 "order_sub_type": sub_type,
-                "time_in_force": "day",
+                "time_in_force": time_in_force,
                 "limit_price": limit_price
             }
         order_url = "https://trade-service.wealthsimple.com/orders"
@@ -149,11 +157,11 @@ class WSTrade():
                             json=order_dict).text
         return json.loads(req)
 
-    def buyLimitOrder(self, security_id, limit_price, account_id=None, quantity=1):
+    def buyLimitOrder(self, security_id, limit_price, account_id=None, quantity=1, gtc=False):
         if account_id is None:
             account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'buy_quantity',
-                               'limit', account_id, limit_price, quantity)
+                               'limit', account_id, limit_price, quantity, gtc)
         return res
 
     def buyMarketOrder(self, security_id, limit_price=1, account_id=None, quantity=1):
@@ -163,11 +171,11 @@ class WSTrade():
                                'market', account_id, limit_price, quantity)
         return res
 
-    def sellLimitOrder(self, security_id, limit_price, account_id=None, quantity=1):
+    def sellLimitOrder(self, security_id, limit_price, account_id=None, quantity=1, gtc=False):
         if account_id is None:
             account_id = self.accounts[0]['AccountID']
         res = self._placeOrder(security_id, 'sell_quantity',
-                               'limit', account_id, limit_price, quantity)
+                               'limit', account_id, limit_price, quantity, gtc)
         return res
 
     def sellMarketOrder(self, security_id, account_id=None, quantity=1):
